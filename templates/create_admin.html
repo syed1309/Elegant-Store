@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Create Admin Account{% endblock %}
+{% block head %}
+<style>
+    .admin-setup-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .admin-setup-container h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 30px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e8e8e8;
+        border-radius: 8px;
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+    .submit-btn {
+        width: 100%;
+        background: #e74c3c;
+        color: white;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        font-weight: 600;
+    }
+    .note {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-setup-container">
+    <h1>Create Admin Account</h1>
+    
+    <div class="note">
+        <strong>Note:</strong> This is a one-time setup. You need the secret key to create an admin account.
+    </div>
+
+    <form action="{{ url_for('create_admin') }}" method="POST">
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required placeholder="Enter admin name">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" required placeholder="Enter admin email">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required placeholder="Enter password (min 8 characters)">
+        </div>
+
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm password">
+        </div>
+
+        <div class="form-group">
+            <label for="secret_key">Secret Key:</label>
+            <input type="password" id="secret_key" name="secret_key" required placeholder="Enter secret key">
+        </div>
+
+        <button type="submit" class="submit-btn">Create Admin Account</button>
+    </form>
+</div>
+{% endblock %}

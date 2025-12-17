@@ -1,33 +1,521 @@
 {% extends "base.html" %}
-{% block title %}Collection{% endblock %}
+{% block title %}Collection - Abaya Store{% endblock %}
 {% block head %}
-<link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet" />
-{% endblock %}
-{% block content %}
+<style>
+    .collection-container {
+        max-width: 1200px;
+        margin: 100px auto 50px;
+        padding: 0 20px;
+    }
 
-<section class="collection-container">
-    <div class="container">
-        <h2>Our Collection</h2>
-        {% set section = request.args.get('section', 'all') %}
-        {% if section != 'all' %}
-            <h3>{{ section | replace('-', ' ') }}</h3>
-        {% endif %}
-        <div class="card-grid">
-            {% for item in items %}
-            <div class="card">
-                <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.title }}" class="card-image" />
-                <div class="card-content">
-                    <h3 class="card-title">{{ item.title }}</h3>
-                    <p class="card-price">{{ item.price }}</p>
-                    <a href="{{ url_for('product', title=item.title) }}" class="buy-now">Buy Now</a>
-                </div>
+    .collection-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .collection-header h1 {
+        font-size: 2.5rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .collection-header p {
+        font-size: 1.1rem;
+        color: #7f8c8d;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .filters-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .filters-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .filters-title {
+        font-size: 1.3rem;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .filter-options {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.9rem;
+    }
+
+    .filter-select {
+        padding: 8px 12px;
+        border: 2px solid #e8e8e8;
+        border-radius: 8px;
+        background: white;
+        font-size: 0.9rem;
+        min-width: 150px;
+    }
+
+    .products-count {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    @media (max-width: 640px) {
+        .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+    }
+
+    @media (min-width: 641px) and (max-width: 968px) {
+        .products-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+    }
+
+    @media (min-width: 969px) {
+        .products-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .product-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    @media (max-width: 640px) {
+        .product-image {
+            height: 150px;
+        }
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.05);
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #e74c3c;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        z-index: 2;
+    }
+
+    .badge-new { background: #27ae60; }
+    .badge-sale { background: #f39c12; }
+
+    .product-info {
+        padding: 20px;
+    }
+
+    @media (max-width: 640px) {
+        .product-info {
+            padding: 15px;
+        }
+    }
+
+    .product-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+
+    .product-description {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #e74c3c;
+        margin-bottom: 15px;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .view-btn {
+        flex: 1;
+        background: #3498db;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    .view-btn:hover {
+        background: #2980b9;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+    }
+
+    .wishlist-btn, .cart-btn {
+        width: 35px;
+        height: 35px;
+        background: #f8f9fa;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .wishlist-btn:hover, .cart-btn:hover {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .load-more {
+        text-align: center;
+        margin-top: 40px;
+    }
+
+    .load-more-btn {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .load-more-btn:hover {
+        background: #2980b9;
+    }
+
+    .no-products {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .no-products h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    .no-products p {
+        color: #7f8c8d;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="collection-container">
+    <div class="collection-header">
+        <h1>Our Collection</h1>
+        <p>Discover our exquisite range of abayas, carefully crafted for elegance and comfort</p>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="filters-header">
+            <div class="filters-title">Filter Products</div>
+            <div class="products-count">{{ items|length }} products found</div>
+        </div>
+        
+        <div class="filter-options">
+            <div class="filter-group">
+                <label class="filter-label">Category</label>
+                <select class="filter-select" onchange="filterProducts()" id="categoryFilter">
+                    <option value="all">All Categories</option>
+                    <option value="Popular Items">Popular Items</option>
+                    <option value="New Arrivals">New Arrivals</option>
+                    <option value="Best Deals">Best Deals</option>
+                </select>
             </div>
-            {% endfor %}
+            
+            <div class="filter-group">
+                <label class="filter-label">Sort By</label>
+                <select class="filter-select" onchange="sortProducts()" id="sortFilter">
+                    <option value="newest">Newest First</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="name">Name: A to Z</option>
+                </select>
+            </div>
         </div>
     </div>
-</section>
 
+    {% if items %}
+    <div class="products-grid" id="productsGrid">
+        {% for item in items %}
+        <div class="product-card" data-category="{{ item.section }}" data-price="{{ item.price|replace('₹','')|replace(',','') }}">
+            {% if item.section == 'New Arrivals' %}
+            <div class="product-badge badge-new">New</div>
+            {% elif item.section == 'Best Deals' %}
+            <div class="product-badge badge-sale">Sale</div>
+            {% else %}
+            <div class="product-badge">Popular</div>
+            {% endif %}
+            
+            <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.title }}" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">{{ item.title }}</h3>
+                <p class="product-description">{{ item.description }}</p>
+                <div class="product-price">{{ item.price }}</div>
+                <div class="product-actions">
+                    <a href="{{ url_for('product', title=item.title) }}" class="view-btn">View Details</a>
+                    <div class="action-buttons">
+                        {% if user %}
+                        <button class="wishlist-btn" onclick="addToWishlist({{ item.id }})">♥</button>
+                        <button class="cart-btn" onclick="addToCart({{ item.id }})">🛒</button>
+                        {% else %}
+                        <button class="wishlist-btn" onclick="showLoginAlert()">♥</button>
+                        <button class="cart-btn" onclick="showLoginAlert()">🛒</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="load-more">
+        <button class="load-more-btn" onclick="loadMoreProducts()">Load More Products</button>
+    </div>
+    {% else %}
+    <div class="no-products">
+        <h2>No Products Available</h2>
+        <p>Check back soon for our latest collection of abayas.</p>
+        {% if user and user.is_admin %}
+        <a href="{{ url_for('add_item') }}" class="view-btn" style="display: inline-block;">
+            Add Products
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
+
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script>
+let visibleProducts = 8;
+
+function filterProducts() {
+    const category = document.getElementById('categoryFilter').value;
+    const products = document.querySelectorAll('.product-card');
+    let visibleCount = 0;
+    
+    products.forEach(product => {
+        const productCategory = product.getAttribute('data-category');
+        
+        if (category === 'all' || productCategory === category) {
+            product.style.display = 'block';
+            visibleCount++;
+            
+            // Show only limited products initially
+            if (visibleCount > visibleProducts) {
+                product.style.display = 'none';
+            }
+        } else {
+            product.style.display = 'none';
+        }
+    });
+    
+    // Update product count
+    document.querySelector('.products-count').textContent = `${visibleCount} products found`;
+}
+
+function sortProducts() {
+    const sortBy = document.getElementById('sortFilter').value;
+    const grid = document.getElementById('productsGrid');
+    const products = Array.from(grid.querySelectorAll('.product-card'));
+    
+    products.sort((a, b) => {
+        switch(sortBy) {
+            case 'price-low':
+                return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+            case 'price-high':
+                return parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price'));
+            case 'name':
+                return a.querySelector('.product-title').textContent.localeCompare(b.querySelector('.product-title').textContent);
+            case 'newest':
+            default:
+                return 0; // Keep original order for newest
+        }
+    });
+    
+    // Reappend sorted products
+    products.forEach(product => grid.appendChild(product));
+}
+
+function loadMoreProducts() {
+    visibleProducts += 8;
+    filterProducts(); // This will show more products based on new visibleProducts count
+}
+
+function addToCart(itemId) {
+    fetch(`/cart/add/${itemId}`)
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.success) {
+                showNotification('Item added to cart!', 'success');
+                updateCartCount();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error adding to cart', 'error');
+        });
+}
+
+function addToWishlist(itemId) {
+    fetch(`/wishlist/add/${itemId}`)
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.success) {
+                showNotification('Item added to wishlist!', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error adding to wishlist', 'error');
+        });
+}
+
+function showLoginAlert() {
+    showNotification('Please login to add items to cart or wishlist', 'warning');
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#f39c12'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Initialize with limited products
+document.addEventListener('DOMContentLoaded', function() {
+    filterProducts();
+});
+
+// Add CSS for notifications
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+</script>
 {% endblock %}

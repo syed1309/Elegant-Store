@@ -4,11 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Abaya Store{% endblock %}</title>
+    <link href="{{ url_for('static', filename='css/header.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet" />
     {% block head %}{% endblock %}
 </head>
 <body>
     {% include "header.html" %}
-    {% block content %}{% endblock %}
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <script src="{{ url_for('static', filename='js/header.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,36 +1,154 @@
 {% extends "base.html" %}
-{% block title %}Contact{% endblock %}
+{% block title %}Contact Us - Abaya Store{% endblock %}
 {% block head %}
 <link href="{{ url_for('static', filename='css/contact.css') }}" rel="stylesheet">
 {% endblock %}
 {% block content %}
 
-<section class="contact-container">
-    <div class="contact-desc-box">
-        <h1>Contact Us</h1>
-        <p>Get In Touch With Us</p>
-    </div>   
-    <div class="contact-form-box">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <p class="flash-{{ category }}">{{ message }}</p>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <form action="{{ url_for('send_message') }}" method="POST">
-            <label for="name">Name:</label>
-            <input type="text" name="name" placeholder="Enter Your Name" required>
-            <br><br>
-            <label for="email">Email:</label>
-            <input type="email" name="email" placeholder="Enter Your Email" required>
-            <br><br>
-            <label for="message">Message:</label>
-            <textarea name="message" placeholder="Type Your Message" required></textarea>
-            <br><br>
-            <button type="submit">Submit</button>
-        </form>
-    </div>   
+<!-- Contact Hero Section -->
+<section class="contact-hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Get In Touch</h1>
+            <p>We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section">
+    <div class="container">
+        <div class="contact-grid">
+            <!-- Contact Form -->
+            <div class="contact-form-container">
+                <div class="form-header">
+                    <h2>Send us a Message</h2>
+                    <p>Fill out the form below and we'll get back to you within 24 hours.</p>
+                </div>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <form action="{{ url_for('send_message') }}" method="POST" class="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                            <div class="input-icon">👤</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                            <div class="input-icon">✉️</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="message">Your Message *</label>
+                            <textarea id="message" name="message" rows="6" placeholder="Tell us how we can help you..." required></textarea>
+                            <div class="input-icon textarea-icon">💬</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-text">Send Message</span>
+                        <span class="btn-icon">→</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <div class="info-card">
+                    <h3>Contact Information</h3>
+                    <p class="info-description">Feel free to reach out to us through any of the following channels:</p>
+                    
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <div class="method-icon">
+                                📍
+                            </div>
+                            <div class="method-details">
+                                <h4>Our Store</h4>
+                                <p>123 Fashion Street<br>Abaya District<br>Riyadh 12345</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="method-icon">
+                                📞
+                            </div>
+                            <div class="method-details">
+                                <h4>Phone Number</h4>
+                                <p>+1 (555) 123-4567<br>Mon-Fri: 9AM-6PM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="method-icon">
+                                ✉️
+                            </div>
+                            <div class="method-details">
+                                <h4>Email Address</h4>
+                                <p>info@abayastore.com<br>support@abayastore.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="method-icon">
+                                🕒
+                            </div>
+                            <div class="method-details">
+                                <h4>Business Hours</h4>
+                                <p>Monday - Friday: 9AM - 8PM<br>Saturday - Sunday: 10AM - 6PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media -->
+                <div class="social-card">
+                    <h3>Follow Us</h3>
+                    <p>Stay connected with us on social media</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link facebook">f</a>
+                        <a href="#" class="social-link twitter">t</a>
+                        <a href="#" class="social-link instagram">ig</a>
+                        <a href="#" class="social-link pinterest">p</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="map-section">
+    <div class="container">
+        <h2>Find Our Store</h2>
+        <div class="map-placeholder">
+            <div class="map-content">
+                <div class="map-icon">🗺️</div>
+                <h3>Store Location Map</h3>
+                <p>Visit our physical store at the location shown on the map</p>
+                <button class="map-btn">View on Google Maps</button>
+            </div>
+        </div>
+    </div>
 </section>
 
 {% endblock %}

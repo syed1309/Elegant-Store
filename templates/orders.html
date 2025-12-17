@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% block title %}My Orders - Abaya Store{% endblock %}
+{% block head %}
+<style>
+    .orders-container {
+        max-width: 1200px;
+        margin: 100px auto 50px;
+        padding: 0 20px;
+    }
+
+    .orders-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .orders-header h1 {
+        font-size: 2.5rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .orders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .order-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        border-left: 5px solid #3498db;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .order-info h3 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+        font-size: 1.3rem;
+    }
+
+    .order-meta {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+
+    .order-status {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    .status-pending { background: #f39c12; color: white; }
+    .status-confirmed { background: #3498db; color: white; }
+    .status-shipped { background: #9b59b6; color: white; }
+    .status-delivered { background: #27ae60; color: white; }
+    .status-cancelled { background: #e74c3c; color: white; }
+
+    .order-items {
+        margin: 20px 0;
+    }
+
+    .order-item {
+        display: flex;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #e8e8e8;
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .order-item-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .order-item-details {
+        flex: 1;
+    }
+
+    .order-item-details h4 {
+        margin: 0 0 5px 0;
+        color: #2c3e50;
+    }
+
+    .order-item-price {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    .order-item-quantity {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+
+    .order-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e8e8e8;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .order-total {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .order-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-btn {
+        padding: 8px 15px;
+        border: 2px solid #3498db;
+        background: white;
+        color: #3498db;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .action-btn:hover {
+        background: #3498db;
+        color: white;
+    }
+
+    .empty-orders {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .empty-orders h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    .empty-orders p {
+        color: #7f8c8d;
+        margin-bottom: 30px;
+    }
+
+    .shop-now-btn {
+        background: #3498db;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+    .shop-now-btn:hover {
+        background: #2980b9;
+    }
+
+    .shipping-address {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+
+    .address-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .address-details {
+        color: #5a6c7d;
+        line-height: 1.4;
+    }
+
+    @media (max-width: 768px) {
+        .order-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .order-footer {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .order-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .action-btn {
+            flex: 1;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-container">
+    <div class="orders-header">
+        <h1>My Orders</h1>
+        <p>Track your orders and view order history</p>
+    </div>
+
+    {% if orders %}
+    <div class="orders-list">
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-info">
+                    <h3>Order #{{ order.id }}</h3>
+                    <div class="order-meta">
+                        Placed on {{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    </div>
+                </div>
+                <div class="order-status status-{{ order.status }}">
+                    {{ order.status }}
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="shipping-address">
+                <div class="address-title">Shipping Address</div>
+                <div class="address-details">
+                    <div>{{ order.address.name }}</div>
+                    <div>{{ order.address.address_line1 }}</div>
+                    {% if order.address.address_line2 %}
+                    <div>{{ order.address.address_line2 }}</div>
+                    {% endif %}
+                    <div>{{ order.address.city }}, {{ order.address.state }} - {{ order.address.pincode }}</div>
+                    <div>Phone: {{ order.address.phone }}</div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="order-items">
+                {% for order_item in order.order_items %}
+                <div class="order-item">
+                    <img src="{{ url_for('static', filename=order_item.item.image) }}" 
+                         alt="{{ order_item.item.title }}" class="order-item-image">
+                    <div class="order-item-details">
+                        <h4>{{ order_item.item.title }}</h4>
+                        <p class="order-item-price">₹{{ "%.2f"|format(order_item.price) }}</p>
+                        <p class="order-item-quantity">Quantity: {{ order_item.quantity }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="order-footer">
+                <div class="order-total">
+                    Total: ₹{{ "%.2f"|format(order.total_amount) }}
+                </div>
+                <div class="order-actions">
+                    <a href="{{ url_for('product', title=order.order_items[0].item.title) }}" class="action-btn">
+                        View Product
+                    </a>
+                    {% if order.status == 'delivered' %}
+                    <button class="action-btn">Reorder</button>
+                    <button class="action-btn">Write Review</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-orders">
+        <h2>No Orders Yet</h2>
+        <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
+        <a href="{{ url_for('collection') }}" class="shop-now-btn">
+            Start Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

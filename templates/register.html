@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Sign In{% endblock %}
+{% block title %}Register{% endblock %}
 {% block head %}
 <link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet" />
 <style>
     .auth-container {
-        max-width: 400px;
+        max-width: 500px;
         margin: 50px auto;
         padding: 30px;
         background: white;
@@ -41,7 +41,7 @@
     .auth-button {
         width: 100%;
         padding: 12px;
-        background: #007bff;
+        background: #28a745;
         color: white;
         border: none;
         border-radius: 5px;
@@ -50,7 +50,7 @@
         transition: background 0.3s;
     }
     .auth-button:hover {
-        background: #0056b3;
+        background: #218838;
     }
     .auth-links {
         text-align: center;
@@ -69,9 +69,13 @@
 
 <section class="auth-container">
     <div class="container">
-        <h2>Sign In</h2>
-        <p>Please sign in to your account.</p>
-        <form action="{{ url_for('signIn') }}" method="POST">
+        <h2>Create Account</h2>
+        <p>Join us today and start shopping!</p>
+        <form action="{{ url_for('register') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name">Full Name:</label>
+                <input type="text" name="name" placeholder="Enter Your Full Name" required>
+            </div>
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" name="email" placeholder="Enter Your Email" required>
@@ -80,10 +84,18 @@
                 <label for="password">Password:</label>
                 <input type="password" name="password" placeholder="Enter Your Password" required>
             </div>
-            <button type="submit" class="auth-button">Sign In</button>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" name="confirm_password" placeholder="Confirm Your Password" required>
+            </div>
+            <div class="form-group">
+                <label for="profile_image">Profile Image (Optional):</label>
+                <input type="file" name="profile_image" accept="image/*">
+            </div>
+            <button type="submit" class="auth-button">Register</button>
         </form>
         <div class="auth-links">
-            <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+            <p>Already have an account? <a href="{{ url_for('signIn') }}">Sign in here</a></p>
         </div>
     </div>
 </section>

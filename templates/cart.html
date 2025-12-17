@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block title %}Shopping Cart - Abaya Store{% endblock %}
+{% block head %}
+<style>
+    .cart-container {
+        max-width: 1200px;
+        margin: 100px auto 50px;
+        padding: 0 20px;
+    }
+
+    .cart-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .cart-header h1 {
+        font-size: 2.5rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .cart-item {
+        display: flex;
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        align-items: center;
+    }
+
+    .cart-item-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-right: 20px;
+    }
+
+    .cart-item-details {
+        flex: 1;
+    }
+
+    .cart-item-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .cart-item-price {
+        font-size: 1.1rem;
+        color: #e74c3c;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    /* Quantity Controls - Row Layout */
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+    }
+
+    .quantity-btn {
+        width: 35px;
+        height: 35px;
+        border: 2px solid #e8e8e8;
+        background: white;
+        border-radius: 6px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .quantity-btn:hover {
+        border-color: #3498db;
+        background: #3498db;
+        color: white;
+    }
+
+    #quantity {
+        width: 50px;
+        height: 35px;
+        border: 2px solid #e8e8e8;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .remove-btn {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+    .remove-btn:hover {
+        background: #c0392b;
+    }
+
+    .cart-summary {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-top: 30px;
+    }
+
+    .checkout-btn {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .checkout-btn:hover {
+        background: #219a52;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .cart-item {
+            flex-direction: column;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .cart-item-image {
+            width: 100%;
+            height: 200px;
+            margin-right: 0;
+            margin-bottom: 15px;
+        }
+
+        .quantity-controls {
+            justify-content: center;
+        }
+
+        .cart-summary {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <div class="cart-header">
+        <h1>Shopping Cart</h1>
+        <p>Review your items and proceed to checkout</p>
+    </div>
+
+    {% if cart_items %}
+    <div class="cart-content">
+        <div class="cart-items">
+            {% for cart_item in cart_items %}
+            <div class="cart-item">
+                <img src="{{ url_for('static', filename=cart_item.item.image) }}" 
+                     alt="{{ cart_item.item.title }}" class="cart-item-image">
+                
+                <div class="cart-item-details">
+                    <h3>{{ cart_item.item.title }}</h3>
+                    <p class="cart-item-price">{{ cart_item.item.price }}</p>
+                </div>
+
+                <div class="quantity-controls">
+                    <form action="{{ url_for('update_cart', cart_id=cart_item.id) }}" method="POST" class="quantity-form">
+                        <button type="button" class="quantity-btn decrease">-</button>
+                        <input type="number" name="quantity" value="{{ cart_item.quantity }}" min="1" max="10" 
+                               class="quantity-input" onchange="this.form.submit()">
+                        <button type="button" class="quantity-btn increase">+</button>
+                    </form>
+                </div>
+
+                <div class="cart-item-actions">
+                    <a href="{{ url_for('remove_from_cart', cart_id=cart_item.id) }}" 
+                       class="remove-btn" onclick="return confirm('Remove this item from cart?')">
+                        Remove
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="cart-summary">
+            <h3>Order Summary</h3>
+            <div class="summary-item">
+                <span>Subtotal:</span>
+                <span>₹{{ "%.2f"|format(total_amount) }}</span>
+            </div>
+            <div class="summary-item">
+                <span>Shipping:</span>
+                <span>Free</span>
+            </div>
+            <div class="summary-item">
+                <span>Tax:</span>
+                <span>₹{{ "%.2f"|format(total_amount * 0.18) }}</span>
+            </div>
+            <div class="summary-item summary-total">
+                <span>Total:</span>
+                <span>₹{{ "%.2f"|format(total_amount * 1.18) }}</span>
+            </div>
+            
+            <a href="{{ url_for('checkout') }}" class="checkout-btn">
+                Proceed to Checkout
+            </a>
+            
+            <a href="{{ url_for('collection') }}" class="continue-shopping" style="display: block; text-align: center; margin-top: 15px;">
+                Continue Shopping
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <h2>Your cart is empty</h2>
+        <p>Add some beautiful abayas to your cart and they will appear here.</p>
+        <a href="{{ url_for('collection') }}" class="continue-shopping">
+            Start Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quantity controls
+    const quantityForms = document.querySelectorAll('.quantity-form');
+    
+    quantityForms.forEach(form => {
+        const decreaseBtn = form.querySelector('.decrease');
+        const increaseBtn = form.querySelector('.increase');
+        const quantityInput = form.querySelector('.quantity-input');
+        
+        decreaseBtn.addEventListener('click', function() {
+            if (quantityInput.value > 1) {
+                quantityInput.value = parseInt(quantityInput.value) - 1;
+                form.submit();
+            }
+        });
+        
+        increaseBtn.addEventListener('click', function() {
+            if (quantityInput.value < 10) {
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+                form.submit();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

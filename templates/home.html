@@ -1,38 +1,211 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Home - Abaya Store{% endblock %}
 {% block head %}
 <link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet" />
 {% endblock %}
-{% block content %}
 
-<section class="home-container">
-    <div class="container">
-        {% for section in sections %}
-        <div class="section-wrapper">
-            <h2 class="section-title">{{ section.title }}</h2>
-            <div class="slider-wrapper">
-                <button class="slider-prev" onclick="scrollSlider('{{ section.title | replace(' ', '-') }}-slider', -1)">&#10094;</button>
-                <div class="card-slider" id="{{ section.title | replace(' ', '-') }}-slider">
-                    {% for card in section.cards %}
-                    <div class="card">
-                        <img src="{{ url_for('static', filename=card.image) }}" alt="{{ card.title }}" class="card-image" />
-                        <div class="card-content">
-                            <h3 class="card-title">{{ card.title }}</h3>
-                            <p class="card-price">{{ card.price }}</p>
-                            <a href="{{ url_for('product', title=card.title) }}" class="buy-now">Buy Now</a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                <button class="slider-next" onclick="scrollSlider('{{ section.title | replace(' ', '-') }}-slider', 1)">&#10095;</button>
-            </div>
-            <a href="{{ url_for('collection') }}?section={{ section.title | replace(' ', '-') }}" class="shop-all">Shop All {{ section.title }}</a>
-        </div>
-        {% endfor %}
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>Discover Elegant Abayas</h1>
+        <p>Shop the latest collection of premium quality abayas with modern designs</p>
+        <a href="{{ url_for('collection') }}" class="cta-button">Shop Now</a>
     </div>
 </section>
 
+<!-- Mobile Search Bar -->
+<div class="mobile-search">
+    <form action="{{ url_for('search') }}" method="GET" class="search-form">
+        <input type="text" name="q" placeholder="Search for abayas..." value="{{ request.args.get('q', '') }}">
+        <button type="submit">🔍</button>
+    </form>
+</div>
+
+{% if empty_sections %}
+<!-- No Products Message -->
+<section class="no-products-message">
+    <div class="container">
+        <h2>No Products Yet</h2>
+        <p>Products will be displayed here once they are added by the admin.</p>
+        {% if user and user.is_admin %}
+        <a href="{{ url_for('add_item') }}" class="cta-button">Add First Product</a>
+        {% endif %}
+    </div>
+</section>
+{% else %}
+<!-- Popular Items Section -->
+<section class="category-section">
+    <div class="section-header">
+        <h2 class="section-title">Popular Items</h2>
+        <p class="section-subtitle">Most loved by our customers</p>
+    </div>
+    
+    <div class="slider-container">
+        <button class="slider-btn prev-btn" onclick="slideLeft('popular')">&#10094;</button>
+        
+        <div class="products-slider" id="popular-slider">
+            {% for item in sections[0].cards %}
+            <div class="product-card">
+                <div class="product-badge badge-popular">Popular</div>
+                <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.title }}" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">{{ item.title }}</h3>
+                    <p class="product-category">{{ item.section }}</p>
+                    <p class="product-description">{{ item.description }}</p>
+                    <div class="product-price">{{ item.price }}</div>
+                    <div class="product-actions">
+                        <a href="{{ url_for('product', title=item.title) }}" class="view-btn">View</a>
+                        <div class="action-buttons">
+                            {% if user %}
+                            <button class="wishlist-btn" onclick="addToWishlist({{ item.id }}, this)">♥</button>
+                            <button class="cart-btn" onclick="addToCart({{ item.id }})">🛒</button>
+                            {% else %}
+                            <button class="wishlist-btn" onclick="showLoginAlert()">♥</button>
+                            <button class="cart-btn" onclick="showLoginAlert()">🛒</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <button class="slider-btn next-btn" onclick="slideRight('popular')">&#10095;</button>
+    </div>
+    
+    <!-- View All Button - Cards ke niche, right side -->
+    {% if sections[0].total_count > 6 %}
+    <div class="view-all-container">
+        <a href="{{ url_for('collection') }}?filter=popular" class="view-all-btn">View All Popular Items ({{ sections[0].total_count }})</a>
+    </div>
+    {% endif %}
+</section>
+
+<!-- New Arrivals Section -->
+<section class="category-section">
+    <div class="section-header">
+        <h2 class="section-title">New Arrivals</h2>
+        <p class="section-subtitle">Fresh styles just for you</p>
+    </div>
+    
+    <div class="slider-container">
+        <button class="slider-btn prev-btn" onclick="slideLeft('new')">&#10094;</button>
+        
+        <div class="products-slider" id="new-slider">
+            {% for item in sections[1].cards %}
+            <div class="product-card">
+                <div class="product-badge badge-new">New</div>
+                <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.title }}" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">{{ item.title }}</h3>
+                    <p class="product-category">{{ item.section }}</p>
+                    <p class="product-description">{{ item.description }}</p>
+                    <div class="product-price">{{ item.price }}</div>
+                    <div class="product-actions">
+                        <a href="{{ url_for('product', title=item.title) }}" class="view-btn">View</a>
+                        <div class="action-buttons">
+                            {% if user %}
+                            <button class="wishlist-btn" onclick="addToWishlist({{ item.id }}, this)">♥</button>
+                            <button class="cart-btn" onclick="addToCart({{ item.id }})">🛒</button>
+                            {% else %}
+                            <button class="wishlist-btn" onclick="showLoginAlert()">♥</button>
+                            <button class="cart-btn" onclick="showLoginAlert()">🛒</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <button class="slider-btn next-btn" onclick="slideRight('new')">&#10095;</button>
+    </div>
+    
+    <!-- View All Button - Cards ke niche, right side -->
+    {% if sections[1].total_count > 6 %}
+    <div class="view-all-container">
+        <a href="{{ url_for('collection') }}?filter=new" class="view-all-btn">View All New Arrivals ({{ sections[1].total_count }})</a>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Best Deals Section -->
+<section class="category-section">
+    <div class="section-header">
+        <h2 class="section-title">Best Deals</h2>
+        <p class="section-subtitle">Great quality at amazing prices</p>
+    </div>
+    
+    <div class="slider-container">
+        <button class="slider-btn prev-btn" onclick="slideLeft('deals')">&#10094;</button>
+        
+        <div class="products-slider" id="deals-slider">
+            {% for item in sections[2].cards %}
+            <div class="product-card">
+                <div class="product-badge badge-sale">Sale</div>
+                <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.title }}" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">{{ item.title }}</h3>
+                    <p class="product-category">{{ item.section }}</p>
+                    <p class="product-description">{{ item.description }}</p>
+                    <div class="product-price">{{ item.price }}</div>
+                    <div class="product-actions">
+                        <a href="{{ url_for('product', title=item.title) }}" class="view-btn">View</a>
+                        <div class="action-buttons">
+                            {% if user %}
+                            <button class="wishlist-btn" onclick="addToWishlist({{ item.id }}, this)">♥</button>
+                            <button class="cart-btn" onclick="addToCart({{ item.id }})">🛒</button>
+                            {% else %}
+                            <button class="wishlist-btn" onclick="showLoginAlert()">♥</button>
+                            <button class="cart-btn" onclick="showLoginAlert()">🛒</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <button class="slider-btn next-btn" onclick="slideRight('deals')">&#10095;</button>
+    </div>
+    
+    <!-- View All Button - Cards ke niche, right side -->
+    {% if sections[2].total_count > 6 %}
+    <div class="view-all-container">
+        <a href="{{ url_for('collection') }}?filter=deals" class="view-all-btn">View All Best Deals ({{ sections[2].total_count }})</a>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🚚</div>
+            <h3 class="feature-title">Free Shipping</h3>
+            <p class="feature-description">Free delivery on orders above ₹2000</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">↩️</div>
+            <h3 class="feature-title">Easy Returns</h3>
+            <p class="feature-description">30-day return policy for all items</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3 class="feature-title">Secure Payment</h3>
+            <p class="feature-description">Your payment information is safe with us</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📞</div>
+            <h3 class="feature-title">24/7 Support</h3>
+            <p class="feature-description">Get help whenever you need it</p>
+        </div>
+    </div>
+</section>
 {% endblock %}
+
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}

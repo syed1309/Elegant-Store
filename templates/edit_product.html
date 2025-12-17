@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Edit Product{% endblock %}
+{% block head %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e8e8e8;
+        border-radius: 8px;
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+    .submit-btn {
+        background: #3498db;
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        cursor: pointer;
+    }
+    .current-image {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Edit Product</h1>
+    
+    <form action="{{ url_for('edit_product', product_id=product.id) }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Current Image:</label>
+            <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.title }}" class="current-image">
+        </div>
+
+        <div class="form-group">
+            <label for="title">Product Title:</label>
+            <input type="text" id="title" name="title" value="{{ product.title }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="text" id="price" name="price" value="{{ product.price }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="section">Section/Category:</label>
+            <select id="section" name="section" required>
+                <option value="Popular Items" {% if product.section == 'Popular Items' %}selected{% endif %}>Popular Items</option>
+                <option value="New Arrivals" {% if product.section == 'New Arrivals' %}selected{% endif %}>New Arrivals</option>
+                <option value="Best Deals" {% if product.section == 'Best Deals' %}selected{% endif %}>Best Deals</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="5" required>{{ product.description }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Update Image (optional):</label>
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+
+        <button type="submit" class="submit-btn">Update Product</button>
+    </form>
+</div>
+{% endblock %}

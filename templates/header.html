@@ -1,43 +1,110 @@
+<header>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">
+                    <h2>Abaya Store</h2>
+                </a>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="search-container">
+                <form action="{{ url_for('search') }}" method="GET" class="search-form">
+                    <input type="text" name="q" placeholder="Search for abayas..." value="{{ request.args.get('q', '') }}">
+                    <button type="submit">🔍</button>
+                </form>
+            </div>
 
-<!-- Header.html  -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- <link rel="stylesheet" href="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"> -->
+            <!-- Mobile Menu Button -->
+            <div class="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
 
-  <link href="/static/css/header.css" rel="stylesheet">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('collection') }}" class="nav-link">Collection</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('about') }}" class="nav-link">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('contact') }}" class="nav-link">Contact</a>
+                </li>
+                
+                {% if user %}
+                    <!-- Admin Panel Link -->
+                    {% if user.is_admin %}
+                    <li class="nav-item admin-link">
+                        <a href="{{ url_for('admin_products') }}" class="nav-link admin-panel">
+                            <span class="admin-icon">⚙️</span>
+                            Admin Panel
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- User Menu -->
+                    <li class="nav-item user-menu">
+                        <div class="user-info">
+                            {% if user.profile_image %}
+                                <img src="{{ url_for('static', filename=user.profile_image) }}" alt="Profile" class="profile-pic">
+                            {% else %}
+                                <div class="profile-pic default-avatar">
+                                    {{ user.name[0]|upper }}
+                                </div>
+                            {% endif %}
+                            <span class="user-name">Hello, {{ user.name }}</span>
+                            {% if user.is_admin %}
+                                <span class="admin-badge">Admin</span>
+                            {% endif %}
+                        </div>
+                        <div class="dropdown-menu">
+                            <a href="{{ url_for('profile') }}" class="dropdown-link">
+                                <span class="dropdown-icon">👤</span>
+                                My Profile
+                            </a>
+                            <a href="{{ url_for('wishlist') }}" class="dropdown-link">
+                                <span class="dropdown-icon">❤️</span>
+                                Wishlist
+                            </a>
+                            <a href="{{ url_for('orders') }}" class="dropdown-link">
+                                <span class="dropdown-icon">📦</span>
+                                My Orders
+                            </a>
+                            {% if user.is_admin %}
+                            <a href="{{ url_for('add_item') }}" class="dropdown-link">
+                                <span class="dropdown-icon">➕</span>
+                                Add Product
+                            </a>
+                            {% endif %}
+                            <a href="{{ url_for('signout') }}" class="dropdown-link">
+                                <span class="dropdown-icon">🚪</span>
+                                Sign Out
+                            </a>
+                        </div>
+                    </li>
 
-  <title></title>
-
-
-   
-
-
-
-</head>
-<body>
- <nav class="navbar">
-    <div class="logo">Abaya store</div>
-    <ul id ="navLinks" class="nav-links">
-      <li><a href="{{url_for('home')}}"> Home</a></li>
-      <li><a href="{{url_for('about')}}"> About Us</a></li>
-      <li><a href="/collection"> Collection</a></li>
-      <li><a href="/contact"> Contact Us</a></li>
-      <li><a href="/signIn"> Sign In</a></li>
-    </ul>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
- </nav>
-
-
-
-
-  <script>
-    function toggleMenu() {
-      document.getElementById("navLinks").classList.toggle("active");
-    }
-  </script>
-
-  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script> -->
+                    <!-- Cart Icon -->
+                    <li class="nav-item cart-icon">
+                        <a href="{{ url_for('cart') }}" class="nav-link cart-link">
+                            <span class="cart-icon">🛒</span>
+                            <span class="cart-count">{{ cart_count }}</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <!-- Guest User Links -->
+                    <li class="nav-item">
+                        <a href="{{ url_for('signIn') }}" class="nav-link">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('register') }}" class="nav-link register-btn">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</header>

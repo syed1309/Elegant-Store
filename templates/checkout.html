@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+{% block title %}Checkout - Abaya Store{% endblock %}
+{% block head %}
+<style>
+    .checkout-container {
+        max-width: 1200px;
+        margin: 100px auto 50px;
+        padding: 0 20px;
+    }
+
+    .checkout-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .checkout-header h1 {
+        font-size: 2.5rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .checkout-content {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 40px;
+    }
+
+    @media (max-width: 968px) {
+        .checkout-content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .checkout-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 25px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    .addresses-grid {
+        display: grid;
+        gap: 20px;
+    }
+
+    .address-option {
+        border: 2px solid #e8e8e8;
+        border-radius: 10px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .address-option:hover {
+        border-color: #3498db;
+    }
+
+    .address-option.selected {
+        border-color: #3498db;
+        background: #f8f9fa;
+    }
+
+    .address-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .address-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .address-type {
+        background: #e74c3c;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .address-default {
+        background: #27ae60;
+    }
+
+    .address-details {
+        color: #5a6c7d;
+        line-height: 1.5;
+    }
+
+    .add-address-btn {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .add-address-btn:hover {
+        background: #2980b9;
+    }
+
+    .order-summary {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 100px;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e8e8e8;
+    }
+
+    .summary-total {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2c3e50;
+        border-bottom: none;
+    }
+
+    .place-order-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+
+    .place-order-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+    }
+
+    .place-order-btn:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .cart-items-review {
+        margin-top: 20px;
+    }
+
+    .cart-item-review {
+        display: flex;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #e8e8e8;
+    }
+
+    .cart-item-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .cart-item-details h4 {
+        margin: 0 0 5px 0;
+        color: #2c3e50;
+    }
+
+    .cart-item-price {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    .cart-item-quantity {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1>Checkout</h1>
+        <p>Review your order and complete your purchase</p>
+    </div>
+
+    <div class="checkout-content">
+        <div class="checkout-main">
+            <!-- Shipping Address -->
+            <div class="checkout-section">
+                <h2 class="section-title">Shipping Address</h2>
+                
+                {% if addresses %}
+                <div class="addresses-grid">
+                    {% for address in addresses %}
+                    <div class="address-option" onclick="selectAddress({{ address.id }})" id="address-{{ address.id }}">
+                        <div class="address-header">
+                            <div class="address-name">{{ address.name }}</div>
+                            <div class="address-type {{ 'address-default' if address.is_default }}">
+                                {{ address.address_type }}{{ ' • Default' if address.is_default }}
+                            </div>
+                        </div>
+                        <div class="address-details">
+                            <div>{{ address.address_line1 }}</div>
+                            {% if address.address_line2 %}
+                            <div>{{ address.address_line2 }}</div>
+                            {% endif %}
+                            <div>{{ address.city }}, {{ address.state }} - {{ address.pincode }}</div>
+                            <div>Phone: {{ address.phone }}</div>
+                            {% if address.landmark %}
+                            <div>Landmark: {{ address.landmark }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p style="color: #7f8c8d; text-align: center; padding: 20px;">
+                    No addresses found. Please add a shipping address to continue.
+                </p>
+                {% endif %}
+                
+                <a href="{{ url_for('profile') }}" class="add-address-btn">
+                    + Add New Address
+                </a>
+            </div>
+
+            <!-- Order Items -->
+            <div class="checkout-section">
+                <h2 class="section-title">Order Items</h2>
+                <div class="cart-items-review">
+                    {% for cart_item in cart_items %}
+                    <div class="cart-item-review">
+                        <img src="{{ url_for('static', filename=cart_item.item.image) }}" 
+                             alt="{{ cart_item.item.title }}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <h4>{{ cart_item.item.title }}</h4>
+                            <p class="cart-item-price">{{ cart_item.item.price }}</p>
+                            <p class="cart-item-quantity">Quantity: {{ cart_item.quantity }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+            <h2 class="section-title">Order Summary</h2>
+            
+            <div class="summary-item">
+                <span>Subtotal ({{ cart_items|length }} items):</span>
+                <span>₹{{ "%.2f"|format(total_amount) }}</span>
+            </div>
+            <div class="summary-item">
+                <span>Shipping:</span>
+                <span>Free</span>
+            </div>
+            <div class="summary-item">
+                <span>Tax (18%):</span>
+                <span>₹{{ "%.2f"|format(total_amount * 0.18) }}</span>
+            </div>
+            <div class="summary-item summary-total">
+                <span>Total:</span>
+                <span>₹{{ "%.2f"|format(total_amount * 1.18) }}</span>
+            </div>
+
+            <form action="{{ url_for('create_order') }}" method="POST" id="orderForm">
+                <input type="hidden" name="address_id" id="selectedAddress" required>
+                <button type="submit" class="place-order-btn" id="placeOrderBtn" disabled>
+                    Place Order
+                </button>
+            </form>
+
+            <a href="{{ url_for('cart') }}" style="display: block; text-align: center; margin-top: 15px; color: #3498db;">
+                ← Back to Cart
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedAddressId = null;
+
+function selectAddress(addressId) {
+    // Remove selected class from all addresses
+    document.querySelectorAll('.address-option').forEach(addr => {
+        addr.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked address
+    document.getElementById(`address-${addressId}`).classList.add('selected');
+    
+    // Update selected address
+    selectedAddressId = addressId;
+    document.getElementById('selectedAddress').value = addressId;
+    
+    // Enable place order button
+    document.getElementById('placeOrderBtn').disabled = false;
+}
+
+// Auto-select default address if exists
+document.addEventListener('DOMContentLoaded', function() {
+    const defaultAddress = document.querySelector('.address-default');
+    if (defaultAddress) {
+        const addressId = defaultAddress.closest('.address-option').id.split('-')[1];
+        selectAddress(parseInt(addressId));
+    }
+});
+
+// Form submission handling
+document.getElementById('orderForm').addEventListener('submit', function(e) {
+    if (!selectedAddressId) {
+        e.preventDefault();
+        alert('Please select a shipping address');
+        return false;
+    }
+});
+</script>
+{% endblock %}

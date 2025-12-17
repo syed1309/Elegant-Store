@@ -1,0 +1,503 @@
+{% extends "base.html" %}
+{% block title %}Search - Abaya Store{% endblock %}
+{% block head %}
+<style>
+    .search-container {
+        max-width: 1200px;
+        margin: 100px auto 50px;
+        padding: 0 20px;
+    }
+
+    .search-header {
+        margin-bottom: 40px;
+    }
+
+    .search-header h1 {
+        font-size: 2.5rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    .search-results {
+        font-size: 1.1rem;
+        color: #7f8c8d;
+    }
+
+    .search-query {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    
+
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .product-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+
+
+  
+
+    .product-card:hover .product-image {
+        transform: scale(1.05);
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        z-index: 2;
+    }
+
+    .badge-new { background: #27ae60; }
+    .badge-sale { background: #f39c12; }
+    .badge-popular { background: #e74c3c; }
+
+    .product-info {
+        padding: 20px;
+    }
+
+ 
+
+    .product-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        line-height: 1.3;
+    }
+
+    .product-category {
+        color: #667eea;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .product-description {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #e74c3c;
+        margin-bottom: 15px;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .view-btn {
+        flex: 1;
+        background: #3498db;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    .view-btn:hover {
+        background: #2980b9;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+    }
+
+    .wishlist-btn, .cart-btn {
+        width: 35px;
+        height: 35px;
+        background: #f8f9fa;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .wishlist-btn.active {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .wishlist-btn:hover, .cart-btn:hover {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .no-results h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    .no-results p {
+        color: #7f8c8d;
+        margin-bottom: 30px;
+    }
+
+    .suggestions {
+        margin-top: 20px;
+    }
+
+    .suggestion-list {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .suggestion-item {
+        background: #f8f9fa;
+        padding: 8px 15px;
+        border-radius: 20px;
+        color: #667eea;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .suggestion-item:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    .browse-all {
+        background: #3498db;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.3s ease;
+        margin-top: 20px;
+        display: inline-block;
+    }
+
+    .browse-all:hover {
+        background: #2980b9;
+    }
+
+    .search-form-large {
+        max-width: 600px;
+        margin: 30px auto;
+        display: flex;
+        gap: 10px;
+    }
+
+    .search-form-large input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 2px solid #e8e8e8;
+        border-radius: 25px;
+        font-size: 1rem;
+        outline: none;
+    }
+
+    .search-form-large button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+    .search-form-large button:hover {
+        background: #5a6fd8;
+    }
+
+
+    @media (max-width: 640px) {
+        .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+         .product-image {
+            height: 150px;
+        }
+
+           .product-info {
+            padding: 15px;
+        }
+    }
+
+
+    @media (max-width: 768px) {
+        .search-form-large {
+            flex-direction: column;
+        }
+        
+        .search-form-large button {
+            border-radius: 8px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <div class="search-header">
+        <h1>Search Results</h1>
+        <div class="search-results">
+            {% if query %}
+                {% if items %}
+                    Found <strong>{{ items|length }}</strong> results for "<span class="search-query">{{ query }}</span>"
+                {% else %}
+                    No results found for "<span class="search-query">{{ query }}</span>"
+                {% endif %}
+            {% else %}
+                Please enter a search term
+            {% endif %}
+        </div>
+    </div>
+
+    {% if items %}
+    <div class="products-grid">
+        {% for item in items %}
+        <div class="product-card">
+            <!-- Category Badge -->
+            <div class="product-badge 
+                {% if item.section == 'New Arrivals' %}badge-new
+                {% elif item.section == 'Best Deals' %}badge-sale
+                {% else %}badge-popular{% endif %}">
+                {{ item.section }}
+            </div>
+            
+            <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.title }}" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">{{ item.title }}</h3>
+                <p class="product-category">{{ item.section }}</p>
+                <p class="product-description">{{ item.description }}</p>
+                <div class="product-price">{{ item.price }}</div>
+                <div class="product-actions">
+                    <a href="{{ url_for('product', title=item.title) }}" class="view-btn">View Details</a>
+                    <div class="action-buttons">
+                        {% if user %}
+                        <button class="wishlist-btn" onclick="addToWishlist({{ item.id }}, this)">♥</button>
+                        <button class="cart-btn" onclick="addToCart({{ item.id }})">🛒</button>
+                        {% else %}
+                        <button class="wishlist-btn" onclick="showLoginAlert()">♥</button>
+                        <button class="cart-btn" onclick="showLoginAlert()">🛒</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% elif query %}
+    <div class="no-results">
+        <h2>No products found</h2>
+        <p>We couldn't find any products matching "{{ query }}"</p>
+        
+        <div class="suggestions">
+            <p><strong>Try these popular searches:</strong></p>
+            <ul class="suggestion-list">
+                <li><a href="{{ url_for('search') }}?q=abaya" class="suggestion-item">Abaya</a></li>
+                <li><a href="{{ url_for('search') }}?q=traditional" class="suggestion-item">Traditional</a></li>
+                <li><a href="{{ url_for('search') }}?q=modern" class="suggestion-item">Modern</a></li>
+                <li><a href="{{ url_for('search') }}?q=designer" class="suggestion-item">Designer</a></li>
+                <li><a href="{{ url_for('search') }}?q=embroidered" class="suggestion-item">Embroidered</a></li>
+                <li><a href="{{ url_for('search') }}?q=black" class="suggestion-item">Black Abaya</a></li>
+            </ul>
+        </div>
+        
+        <a href="{{ url_for('collection') }}" class="browse-all">
+            Browse All Products
+        </a>
+    </div>
+    {% else %}
+    <div class="no-results">
+        <h2>Search for products</h2>
+        <p>Enter a search term to find beautiful abayas in our collection</p>
+        
+        <!-- Search Form -->
+        <form action="{{ url_for('search') }}" method="GET" class="search-form-large">
+            <input type="text" name="q" placeholder="What are you looking for? (e.g., black abaya, embroidered, modern)" value="{{ query }}">
+            <button type="submit">Search</button>
+        </form>
+        
+        <div class="suggestions">
+            <p><strong>Popular Categories:</strong></p>
+            <ul class="suggestion-list">
+                <li><a href="{{ url_for('search') }}?q=popular items" class="suggestion-item">Popular Items</a></li>
+                <li><a href="{{ url_for('search') }}?q=new arrivals" class="suggestion-item">New Arrivals</a></li>
+                <li><a href="{{ url_for('search') }}?q=best deals" class="suggestion-item">Best Deals</a></li>
+                <li><a href="{{ url_for('search') }}?q=premium" class="suggestion-item">Premium Collection</a></li>
+            </ul>
+        </div>
+        
+        <a href="{{ url_for('collection') }}" class="browse-all">
+            Or Browse All Products
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addToCart(itemId) {
+    fetch(`/cart/add/${itemId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                updateCartCount();
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error adding to cart', 'error');
+        });
+}
+
+function addToWishlist(itemId, button) {
+    fetch(`/wishlist/add/${itemId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                // Update button state visually
+                button.classList.add('active');
+                button.style.background = '#e74c3c';
+                button.style.color = 'white';
+            } else {
+                showNotification(data.message, 'info');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error adding to wishlist', 'error');
+        });
+}
+function showLoginAlert() {
+    showNotification('Please login to add items to cart or wishlist', 'warning');
+}
+
+function showNotification(message, type) {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => {
+        if (notification.parentNode) {
+            document.body.removeChild(notification);
+        }
+    });
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#f39c12'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+function updateCartCount() {
+    // This will reload the page to get updated cart count
+    setTimeout(() => {
+        window.location.reload();
+    }, 1000);
+}
+
+// Add CSS for notifications
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
