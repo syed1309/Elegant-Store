@@ -130,11 +130,11 @@
                     </div>
 
                     <div class="action-buttons">
-                        <button class="add-to-cart-btn" onclick="addToCart({{ item.id }})">
+                        <button class="add-to-cart-btn" onclick="addToCart('{{ item.id }}')">
                             <span class="btn-icon">🛒</span>
                             Add to Cart
                         </button>
-                        <button class="wishlist-btn {{ 'active' if in_wishlist }}" onclick="addToWishlist({{ item.id }})" id="wishlistBtn">
+                        <button class="wishlist-btn {{ 'active' if in_wishlist }}" onclick="addToWishlist('{{item.id }}')" id="wishlistBtn">
                             <span class="btn-icon">❤️</span>
                             {{ 'In Wishlist' if in_wishlist else 'Wishlist' }}
                         </button>
