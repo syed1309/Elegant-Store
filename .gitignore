@@ -3,3 +3,4 @@
 venv/
 __pycache__/
 app copy.py
+templates/contact copy.html
